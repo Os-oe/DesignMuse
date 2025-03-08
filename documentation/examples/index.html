@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeJS Beispiele Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f6f4f2;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .category {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .category h2 {
+            color: #e31b6d;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .demo-list {
+            list-style: none;
+        }
+
+        .demo-list li {
+            margin: 0.5rem 0;
+        }
+
+        .demo-list a {
+            color: #2c3e50;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-list a:hover {
+            background-color: #f8f9fa;
+            color: #e31b6d;
+            transform: translateX(5px);
+        }
+
+        .search-container {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 500px;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #e31b6d;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>AnimeJS Beispiele Dashboard</h1>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Suche nach Beispielen...">
+    </div>
+
+    <div class="categories">
+        <div class="category">
+            <h2>Grundlegende Animationen</h2>
+            <ul class="demo-list">
+                <li><a href="built-in-easings.html">Eingebaute Easing-Funktionen</a></li>
+                <li><a href="keyframes.html">Keyframe Animationen</a></li>
+                <li><a href="transforms-demo.html">Transform Animationen</a></li>
+                <li><a href="colors-test.html">Farb-Animationen</a></li>
+            </ul>
+        </div>
+
+        <div class="category">
+            <h2>Fortgeschrittene Techniken</h2>
+            <ul class="demo-list">
+                <li><a href="advanced-staggering.html">Fortgeschrittenes Staggering</a></li>
+                <li><a href="advanced-staggering-2.html">Fortgeschrittenes Staggering 2</a></li>
+                <li><a href="complex-properties.html">Komplexe Eigenschaften</a></li>
+                <li><a href="layered-animations.html">Mehrschichtige Animationen</a></li>
+            </ul>
+        </div>
+
+        <div class="category">
+            <h2>SVG Animationen</h2>
+            <ul class="demo-list">
+                <li><a href="svg-lines-animations.html">SVG Linien Animation</a></li>
+                <li><a href="svg-path-animation.html">SVG Pfad Animation</a></li>
+                <li><a href="svg-path-animation-responsive.html">Responsive SVG Animation</a></li>
+            </ul>
+        </div>
+
+        <div class="category">
+            <h2>Stagger Effekte</h2>
+            <ul class="demo-list">
+                <li><a href="stagger-demo.html">Stagger Demo</a></li>
+                <li><a href="stagger-grid-demo.html">Stagger Grid</a></li>
+                <li><a href="staggered-animations.html">Gestaffelte Animationen</a></li>
+                <li><a href="staggered-easing-demo.html">Gestaffeltes Easing</a></li>
+            </ul>
+        </div>
+
+        <div class="category">
+            <h2>Timing & Kontrolle</h2>
+            <ul class="demo-list">
+                <li><a href="timeline.html">Timeline Beispiel</a></li>
+                <li><a href="time-control.html">Zeitsteuerung</a></li>
+                <li><a href="callbacks.html">Callback Funktionen</a></li>
+                <li><a href="directions-testing.html">Richtungssteuerung</a></li>
+            </ul>
+        </div>
+
+        <div class="category">
+            <h2>Spezielle Demos</h2>
+            <ul class="demo-list">
+                <li><a href="animejs-v3-logo-animation.html">AnimeJS v3 Logo</a></li>
+                <li><a href="animejs-v2-logo-animation.html">AnimeJS v2 Logo</a></li>
+                <li><a href="animejs-mgs-logo-animation.html">MGS Logo Animation</a></li>
+                <li><a href="ease-visualizer.html">Easing Visualisierer</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const demoItems = document.querySelectorAll('.demo-list li');
+
+            demoItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide categories based on whether they have visible items
+            document.querySelectorAll('.category').forEach(category => {
+                const hasVisibleItems = Array.from(category.querySelectorAll('.demo-list li'))
+                    .some(item => item.style.display !== 'none');
+                category.style.display = hasVisibleItems ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html> 

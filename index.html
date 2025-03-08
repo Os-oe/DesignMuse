@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignMuse | The AI Design Agent That Brings Your Ideas to Life</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --accent: #818cf8;
+            --dark: #1e1b4b;
+            --light: #f5f3ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            z-index: 2;
+            perspective: 1000px;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            perspective: 1000px;
+        }
+
+        .letter-wrapper {
+            display: inline-block;
+            position: relative;
+            transform-style: preserve-3d;
+            opacity: 0;
+            transform: rotateX(-90deg);
+            cursor: pointer;
+        }
+
+        .letter {
+            display: inline-block;
+            font-weight: 700;
+            color: var(--light);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .letter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+
+        .letter::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .letter-wrapper:hover .letter::after {
+            opacity: 1;
+        }
+
+        .letter-wrapper:hover {
+            transform: translateY(-5px) rotateX(0deg) scale(1.1);
+        }
+
+        /* Individual letter colors on hover */
+        .letter-wrapper:nth-child(1):hover .letter { color: #FF6B6B; text-shadow: 0 0 15px rgba(255, 107, 107, 0.5); }
+        .letter-wrapper:nth-child(2):hover .letter { color: #4ECDC4; text-shadow: 0 0 15px rgba(78, 205, 196, 0.5); }
+        .letter-wrapper:nth-child(3):hover .letter { color: #FFD93D; text-shadow: 0 0 15px rgba(255, 217, 61, 0.5); }
+        .letter-wrapper:nth-child(4):hover .letter { color: #FF8CC3; text-shadow: 0 0 15px rgba(255, 140, 195, 0.5); }
+        .letter-wrapper:nth-child(5):hover .letter { color: #6C5CE7; text-shadow: 0 0 15px rgba(108, 92, 231, 0.5); }
+        .letter-wrapper:nth-child(6):hover .letter { color: #A8E6CF; text-shadow: 0 0 15px rgba(168, 230, 207, 0.5); }
+        .letter-wrapper:nth-child(7):hover .letter { color: #FF9A8B; text-shadow: 0 0 15px rgba(255, 154, 139, 0.5); }
+        .letter-wrapper:nth-child(8):hover .letter { color: #A8E6CF; text-shadow: 0 0 15px rgba(168, 230, 207, 0.5); }
+        .letter-wrapper:nth-child(9):hover .letter { color: #FFD93D; text-shadow: 0 0 15px rgba(255, 217, 61, 0.5); }
+        .letter-wrapper:nth-child(10):hover .letter { color: #FF8CC3; text-shadow: 0 0 15px rgba(255, 140, 195, 0.5); }
+
+        .hero p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .cta-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 4rem;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .input-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 2rem;
+            z-index: 3;
+        }
+
+        .creative-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: var(--light);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .creative-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .creative-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .transform-container {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            color: #fff;
+            will-change: transform;
+        }
+
+        .dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            filter: blur(4px);
+            background: inherit;
+            opacity: 0.5;
+        }
+
+        .animation-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .animated-block {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff4444, #00c853);
+            border-radius: 8px;
+            position: relative;
+            transform-origin: center;
+        }
+
+        .animated-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.5), rgba(0, 200, 83, 0.5));
+            filter: blur(8px);
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        .command-list {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .command-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .command-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .message-container {
+            text-align: center;
+            padding: 2rem;
+            color: var(--light);
+            position: relative;
+            z-index: 2;
+        }
+
+        .message-container h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .message-container p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .creative-canvas {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            border-radius: 20px;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* Navigation Styles */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(30, 27, 75, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo span {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: var(--dark);
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-section h3 {
+            color: var(--light);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="#" class="nav-logo">
+            <span>Design</span>Muse
+        </a>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#showcase">Showcase</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="hero">
+        <div class="floating-shapes"></div>
+        <div class="particles"></div>
+        <div class="hero-content">
+            <h1 id="title"></h1>
+            <p>Your AI design companion that transforms ideas into stunning visuals. Watch as your creative vision comes to life with intelligent, adaptive design solutions.</p>
+            <a href="#" class="cta-button">Start Creating Magic</a>
+            <div class="features">
+                <div class="input-container">
+                    <input type="text" class="creative-input" placeholder="Type your creative idea..." id="creativeInput">
+                    <div class="glow-effect"></div>
+                </div>
+                <div class="creative-canvas">
+                    <div class="transform-container"></div>
+                    <div class="command-list">
+                        <button class="command-btn" data-command="rotate">Rotate</button>
+                        <button class="command-btn" data-command="expand">Expand</button>
+                        <button class="command-btn" data-command="spiral">Spiral</button>
+                        <button class="command-btn" data-command="chaos">Chaos</button>
+                        <button class="command-btn" data-command="pulse">Pulse</button>
+                    </div>
+                </div>
+                <div class="message-container">
+                    <h2>Unleash Your Creative Potential</h2>
+                    <p>From concept to reality, our AI companion transforms your wildest ideas into stunning designs. Whether you have a clear vision or need inspiration, we're here to bring your creativity to life. ✨</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About DesignMuse</h3>
+                <p>DesignMuse is your AI-powered design companion, transforming creative ideas into stunning visual realities. We combine cutting-edge technology with artistic innovation.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#showcase">Showcase</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:hello@designmuse.ai">hello@designmuse.ai</a></li>
+                    <li><a href="#support">Support Center</a></li>
+                    <li><a href="#feedback">Feedback</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="#twitter">Twitter</a>
+                    <a href="#instagram">Instagram</a>
+                    <a href="#linkedin">LinkedIn</a>
+                    <a href="#github">GitHub</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 DesignMuse. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Create title with individual letters
+        const title = "DesignMuse";
+        const titleElement = document.getElementById('title');
+        
+        [...title].forEach((char) => {
+            const wrapper = document.createElement('span');
+            wrapper.className = 'letter-wrapper';
+            
+            const letter = document.createElement('span');
+            letter.className = 'letter';
+            letter.textContent = char;
+            
+            wrapper.appendChild(letter);
+            titleElement.appendChild(wrapper);
+        });
+
+        // Create floating shapes
+        const shapes = [];
+        for (let i = 0; i < 20; i++) {
+            const shape = document.createElement('div');
+            shape.classList.add('shape');
+            shape.style.width = Math.random() * 100 + 20 + 'px';
+            shape.style.height = shape.style.width;
+            shape.style.left = Math.random() * 100 + '%';
+            shape.style.top = Math.random() * 100 + '%';
+            document.querySelector('.floating-shapes').appendChild(shape);
+            shapes.push(shape);
+        }
+
+        // Create particles
+        const particles = [];
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.width = '4px';
+            particle.style.height = '4px';
+            document.querySelector('.particles').appendChild(particle);
+            particles.push(particle);
+        }
+
+        // Animate letters with timeline
+        const letterTimeline = anime.timeline({
+            easing: 'easeOutExpo'
+        });
+
+        letterTimeline
+            .add({
+                targets: '.letter-wrapper',
+                opacity: [0, 1],
+                rotateX: [-90, 0],
+                duration: 1200,
+                delay: anime.stagger(100),
+                complete: function(anim) {
+                    document.querySelectorAll('.letter-wrapper').forEach(el => {
+                        el.style.transform = 'rotateX(0deg)';
+                        el.style.opacity = '1';
+                    });
+                }
+            })
+            .add({
+                targets: '.hero p',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                offset: '-=800'
+            })
+            .add({
+                targets: '.cta-button',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                offset: '-=800'
+            })
+            .add({
+                targets: '.features',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                offset: '-=600'
+            });
+
+        // Animate floating shapes
+        shapes.forEach((shape, index) => {
+            anime({
+                targets: shape,
+                translateX: () => anime.random(-50, 50),
+                translateY: () => anime.random(-50, 50),
+                scale: [0.8, 1.2],
+                opacity: [0.1, 0.3],
+                duration: () => anime.random(3000, 5000),
+                delay: index * 100,
+                direction: 'alternate',
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+        });
+
+        // Animate particles
+        particles.forEach((particle, index) => {
+            const x = anime.random(0, window.innerWidth);
+            const y = anime.random(0, window.innerHeight);
+            
+            anime({
+                targets: particle,
+                opacity: [0, 0.5, 0],
+                scale: [0, 1.5],
+                translateX: [x - 100, x + 100],
+                translateY: [y - 100, y + 100],
+                duration: () => anime.random(2000, 4000),
+                delay: index * 50,
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+        });
+
+        // Add pulsing glow effect to letters
+        document.querySelectorAll('.letter-wrapper').forEach((wrapper, index) => {
+            wrapper.addEventListener('mouseenter', () => {
+                anime({
+                    targets: wrapper.querySelector('.letter'),
+                    scale: [1, 1.2, 1],
+                    rotate: [-5, 5, 0],
+                    duration: 600,
+                    easing: 'easeInOutQuad'
+                });
+            });
+        });
+
+        // Transform animation system
+        const transformContainer = document.querySelector('.transform-container');
+        const numberOfDots = 300;
+        let currentTransformAnimation = null;
+
+        // Create dots
+        for (let i = 0; i < numberOfDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            transformContainer.appendChild(dot);
+        }
+
+        const dots = document.querySelectorAll('.dot');
+
+        function createDots() {
+            transformContainer.innerHTML = ''; // Clear existing dots
+            const containerWidth = transformContainer.offsetWidth;
+            const containerHeight = transformContainer.offsetHeight;
+            
+            // Erstelle Punkte mit zufälliger Verteilung
+            for (let i = 0; i < 400; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                // Zufällige Startposition
+                const randomX = Math.random() * containerWidth;
+                const randomY = Math.random() * containerHeight;
+                dot.style.position = 'absolute';
+                dot.style.left = `${randomX}px`;
+                dot.style.top = `${randomY}px`;
+                transformContainer.appendChild(dot);
+            }
+        }
+
+        function createMorphingAnimation() {
+            const containerWidth = transformContainer.offsetWidth;
+            const containerHeight = transformContainer.offsetHeight;
+            
+            return anime({
+                targets: '.dot',
+                translateX: function() {
+                    const range = containerWidth / 2;
+                    return anime.random(-range, range);
+                },
+                translateY: function() {
+                    const range = containerHeight / 2;
+                    return anime.random(-range, range);
+                },
+                scale: function() {
+                    return anime.random(0.2, 1.5);
+                },
+                opacity: function() {
+                    return anime.random(0.3, 1);
+                },
+                backgroundColor: function() {
+                    return `hsl(${anime.random(0, 360)}, 80%, 60%)`;
+                },
+                duration: function() {
+                    // Unterschiedliche Geschwindigkeiten für jeden Punkt
+                    return anime.random(2000, 6000);
+                },
+                delay: function() {
+                    // Zufällige Startverzögerung für jeden Punkt
+                    return anime.random(0, 1000);
+                },
+                loop: true,
+                direction: 'alternate',
+                easing: function() {
+                    // Zufällige Bewegungskurven
+                    const easings = ['easeInOutSine', 'easeInOutQuad', 'easeInOutCubic'];
+                    return easings[Math.floor(Math.random() * easings.length)];
+                },
+                complete: function(anim) {
+                    // Nach jeder Animation neue zufällige Ziele setzen
+                    const dot = this.targets[0];
+                    anime({
+                        targets: dot,
+                        translateX: anime.random(-containerWidth/2, containerWidth/2),
+                        translateY: anime.random(-containerHeight/2, containerHeight/2),
+                        scale: anime.random(0.2, 1.5),
+                        duration: anime.random(2000, 4000),
+                        easing: 'easeInOutBack'
+                    });
+                }
+            });
+        }
+
+        // Update the dot creation to support new animation features
+        function createDots() {
+            transformContainer.innerHTML = ''; // Clear existing dots
+            const containerWidth = transformContainer.offsetWidth;
+            const containerHeight = transformContainer.offsetHeight;
+            
+            // Erstelle Punkte mit zufälliger Verteilung
+            for (let i = 0; i < 400; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                // Zufällige Startposition
+                const randomX = Math.random() * containerWidth;
+                const randomY = Math.random() * containerHeight;
+                dot.style.position = 'absolute';
+                dot.style.left = `${randomX}px`;
+                dot.style.top = `${randomY}px`;
+                transformContainer.appendChild(dot);
+            }
+        }
+
+        // Update dot styles
+        const dotStyles = document.createElement('style');
+        dotStyles.textContent = `
+            .dot {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background: currentColor;
+                border-radius: 50%;
+                will-change: transform, opacity, background-color;
+                transition: background-color 0.5s ease;
+            }
+            
+            .dot::after {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: inherit;
+                border-radius: inherit;
+                filter: blur(2px);
+                opacity: 0.7;
+                z-index: -1;
+            }
+            
+            .transform-container {
+                transform-style: preserve-3d;
+                perspective: 1000px;
+            }
+        `;
+        document.head.appendChild(dotStyles);
+
+        // Initialize the new animation system
+        createDots();
+        currentTransformAnimation = createMorphingAnimation();
+
+        // Update color system
+        function updateColors(hue) {
+            dots.forEach((dot, i) => {
+                const lightness = 50 + (i * 0.1) % 20;
+                dot.style.color = `hsl(${hue}, 80%, ${lightness}%)`;
+            });
+        }
+
+        // Command handling
+        const transformCommands = {
+            'rotate': rotateAnimation,
+            'expand': expandAnimation,
+            'spiral': spiralAnimation,
+            'chaos': chaosAnimation,
+            'pulse': pulseAnimation
+        };
+
+        // Handle input commands
+        const creativeInput = document.getElementById('creativeInput');
+        const glowEffect = document.querySelector('.glow-effect');
+        
+        creativeInput.addEventListener('input', (e) => {
+            const value = e.target.value.toLowerCase();
+            const hue = (value.length * 20) % 360;
+            
+            updateColors(hue);
+
+            // Check for specific commands in the input
+            if (value.includes('drehen') || value.includes('rotate')) {
+                if (currentTransformAnimation) currentTransformAnimation.pause();
+                currentTransformAnimation = rotateAnimation();
+            } else if (value.includes('expand') || value.includes('größer')) {
+                if (currentTransformAnimation) currentTransformAnimation.pause();
+                currentTransformAnimation = expandAnimation();
+            } else if (value.includes('spiral') || value.includes('wirbel')) {
+                if (currentTransformAnimation) currentTransformAnimation.pause();
+                currentTransformAnimation = spiralAnimation();
+            } else if (value.includes('chaos') || value.includes('wild')) {
+                if (currentTransformAnimation) currentTransformAnimation.pause();
+                currentTransformAnimation = chaosAnimation();
+            } else if (value.includes('pulse') || value.includes('puls')) {
+                if (currentTransformAnimation) currentTransformAnimation.pause();
+                currentTransformAnimation = pulseAnimation();
+            }
+        });
+
+        // Button controls
+        document.querySelectorAll('.command-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const command = btn.dataset.command;
+                if (currentTransformAnimation) {
+                    currentTransformAnimation.pause();
+                }
+                currentTransformAnimation = transformCommands[command]();
+            });
+        });
+
+        // Initialize with base animation
+        currentTransformAnimation = createMorphingAnimation();
+        anime(currentTransformAnimation);
+    </script>
+</body>
+</html> 
